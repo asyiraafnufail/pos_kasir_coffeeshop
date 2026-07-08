@@ -43,4 +43,30 @@ class MenuController extends Controller
 
         return redirect()->back()->with('success', 'Menu baru berhasil ditambahkan!');
     }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'price' => 'required|numeric|min:0',
+            'is_available' => 'required|boolean',
+        ]);
+
+        Menu::findOrFail($id)->update([
+            'name' => $request->name,
+            'category_id' => $request->category_id,
+            'price' => $request->price,
+            'is_available' => $request->is_available,
+        ]);
+
+        return redirect()->back()->with('success', 'Menu berhasil diperbarui!');
+    }
+
+    // --- FUNGSI UNTUK MENGHAPUS MENU ---
+    public function destroy($id)
+    {
+        Menu::findOrFail($id)->delete();
+        return redirect()->back()->with('success', 'Menu berhasil dihapus!');
+    }
 }
