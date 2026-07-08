@@ -27,6 +27,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/menu/{id}', [MenuController::class, 'update'])->name('menu.update');
     Route::delete('/menu/{id}', [MenuController::class, 'destroy'])->name('menu.destroy');
 
+    Route::get('/pengeluaran', [ExpenseController::class, 'index'])->name('expense.index');
+    Route::post('/pengeluaran', [ExpenseController::class, 'store'])->name('expense.store');
+    Route::delete('/pengeluaran/{id}', [ExpenseController::class, 'destroy'])->name('expense.destroy');
+
     // --- Rute Profile ---
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
