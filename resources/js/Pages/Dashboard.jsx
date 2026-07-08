@@ -1,7 +1,52 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
+// Import Chart.js
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
-export default function Dashboard({ auth, totalIncome, totalExpense, netProfit, totalTransactions }) {
+// Registrasi elemen Chart.js
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+// Tambahkan props chartLabels dan chartValues
+export default function Dashboard({ auth, totalIncome, totalExpense, netProfit, totalTransactions, chartLabels, chartValues }) {
+    
+    // Konfigurasi data untuk grafik
+    const chartData = {
+        labels: chartLabels.map(date => new Date(date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })),
+        datasets: [
+            {
+                label: 'Pendapatan Kotor (Rp)',
+                data: chartValues,
+                backgroundColor: 'rgba(79, 70, 229, 0.8)', // Warna Indigo Tailwind
+                borderRadius: 6,
+            },
+        ],
+    };
+
+    // Opsi tampilan grafik
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: false,
+            },
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return 'Rp ' + value.toLocaleString('id-ID');
+                    }
+                }
+            }
+        }
+    };
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -14,8 +59,6 @@ export default function Dashboard({ auth, totalIncome, totalExpense, netProfit, 
                     
                     {/* Baris Atas: Kartu Statistik */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        
-                        {/* Kartu 1: Pendapatan Kotor */}
                         <div className="bg-white overflow-hidden shadow-sm sm:rounded-xl p-6 border-b-4 border-green-500">
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-gray-500 font-bold text-sm uppercase tracking-wider">Pendapatan Kotor</h3>
@@ -29,7 +72,6 @@ export default function Dashboard({ auth, totalIncome, totalExpense, netProfit, 
                             <p className="text-xs text-gray-400 mt-2 font-medium">Dari {totalTransactions} total transaksi kasir</p>
                         </div>
 
-                        {/* Kartu 2: Pengeluaran */}
                         <div className="bg-white overflow-hidden shadow-sm sm:rounded-xl p-6 border-b-4 border-red-500">
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-gray-500 font-bold text-sm uppercase tracking-wider">Total Pengeluaran</h3>
@@ -43,9 +85,7 @@ export default function Dashboard({ auth, totalIncome, totalExpense, netProfit, 
                             <p className="text-xs text-gray-400 mt-2 font-medium">Berdasarkan pencatatan manual</p>
                         </div>
 
-                        {/* Kartu 3: Keuntungan Bersih */}
                         <div className="bg-white overflow-hidden shadow-sm sm:rounded-xl p-6 border-b-4 border-indigo-500 relative overflow-hidden">
-                            {/* Efek hiasan background */}
                             <div className="absolute -right-6 -top-6 w-24 h-24 bg-indigo-50 rounded-full opacity-50"></div>
                             
                             <div className="flex justify-between items-center mb-4 relative z-10">
@@ -61,19 +101,26 @@ export default function Dashboard({ auth, totalIncome, totalExpense, netProfit, 
                                 {netProfit < 0 ? 'Bisnis sedang merugi' : 'Bisnis mencetak profit positif'}
                             </p>
                         </div>
-
                     </div>
 
-                    {/* Banner Sambutan */}
-                    <div className="bg-indigo-600 rounded-xl shadow-lg p-8 text-white mt-8 flex flex-col md:flex-row items-center justify-between">
-                        <div>
-                            <h2 className="text-2xl font-black mb-2">Selamat Datang di Cankz Coffee!</h2>
-                            <p className="text-indigo-100 font-medium">Sistem Point of Sales (POS) V1.0 Anda telah beroperasi sepenuhnya. Pantau terus angka di atas untuk memastikan bisnis Anda bertumbuh.</p>
+                    {/* ================= BAGIAN BARU: GRAFIK TREN PENJUALAN ================= */}
+                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-xl border border-gray-200">
+                        <div className="p-6 border-b border-gray-100">
+                            <h3 className="text-lg font-bold text-gray-800">Tren Pendapatan (7 Hari Terakhir)</h3>
+                            <p className="text-sm text-gray-500">Statistik penjualan harian kasir</p>
                         </div>
-                        <div className="hidden md:block">
-                            <svg className="w-24 h-24 text-indigo-300 opacity-50" fill="none" stroke="currentColor" strokeWidth="1" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 8h16M5 8v9a4 4 0 004 4h6a4 4 0 004-4V8M8 4h8M10 4v4m4-4v4"></path></svg>
+                        <div className="p-6 h-80 w-full">
+                            {/* Render grafik Bar dari Chart.js */}
+                            {chartLabels.length > 0 ? (
+                                <Bar data={chartData} options={chartOptions} />
+                            ) : (
+                                <div className="flex h-full items-center justify-center text-gray-400">
+                                    Belum ada data transaksi yang cukup untuk menampilkan grafik.
+                                </div>
+                            )}
                         </div>
                     </div>
+                    {/* ====================================================================== */}
 
                 </div>
             </div>
