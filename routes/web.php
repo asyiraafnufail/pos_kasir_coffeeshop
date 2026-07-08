@@ -21,9 +21,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders', [KasirController::class, 'store'])->name('orders.store'); 
     
     // --- Rute Admin: Manajemen Menu ---
-    Route::get('/menu', [MenuController::class, 'index'])->name('menu.index');
     Route::get('/menu', [MenuController::class, 'index'])->name('menu.index'); 
-    Route::post('/menu', [MenuController::class, 'store'])->name('menu.store');
+    Route::post('/menu', [MenuController::class, 'store'])->name('menu.store'); 
+    Route::put('/menu/{id}', [MenuController::class, 'update'])->name('menu.update');
+    Route::delete('/menu/{id}', [MenuController::class, 'destroy'])->name('menu.destroy');
 
     // --- Rute Profile ---
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
