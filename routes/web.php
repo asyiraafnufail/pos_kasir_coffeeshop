@@ -21,7 +21,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders', [KasirController::class, 'store'])->name('orders.store'); 
     
     // --- Rute Admin: Manajemen Menu ---
-    Route::get('/menu', [MenuController::class, 'index'])->name('menu.index'); // 2. Tambahkan baris ini
+    Route::get('/menu', [MenuController::class, 'index'])->name('menu.index');
+    Route::get('/menu', [MenuController::class, 'index'])->name('menu.index'); 
+    Route::post('/menu', [MenuController::class, 'store'])->name('menu.store');
 
     // --- Rute Profile ---
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
