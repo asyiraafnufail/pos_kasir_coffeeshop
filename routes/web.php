@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\KasirController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\DashboardController;   
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -12,9 +13,9 @@ Route::get('/', function () {
     return redirect()->route('login'); // Langsung arahkan halaman depan ke login
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     // --- Rute Kasir ---
