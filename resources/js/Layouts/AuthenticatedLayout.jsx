@@ -144,15 +144,18 @@ export default function AuthenticatedLayout({ header, children }) {
                     {/* BAGIAN MOBILE NAVIGATION YANG DIPERBAIKI */}
                     <div className="pt-2 pb-3 space-y-1">
                         {user.role === 'admin' && (
-                            <>
-                                <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
-                                    Dashboard Admin
-                                </ResponsiveNavLink>
-                                <ResponsiveNavLink href={route('menu.index')} active={route().current('menu.index')}>
-                                    Manajemen Menu
-                                </ResponsiveNavLink>
-                            </>
-                        )}
+                         <>
+                             <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
+                                 Dashboard Admin
+                             </ResponsiveNavLink>
+                             <ResponsiveNavLink href={route('menu.index')} active={route().current('menu.index')}>
+                                 Manajemen Menu
+                             </ResponsiveNavLink>
+                             <ResponsiveNavLink href={route('expense.index')} active={route().current('expense.index')}>
+                                 Pengeluaran
+                             </ResponsiveNavLink>
+                         </>
+                     )}
                         
                         <ResponsiveNavLink href={route('kasir.index')} active={route().current('kasir.index')}>
                             Area Kasir
