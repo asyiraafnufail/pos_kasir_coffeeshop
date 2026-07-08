@@ -51,22 +51,26 @@ export default function MenuIndex({ auth, menus, categories }) {
         e.preventDefault();
         
         if (isEditMode) {
-            // Jika mode edit, gunakan fungsi PUT ke rute menu.update
+            // SUNTIKKAN preserveScroll: true DI SINI
             put(route('menu.update', currentMenuId), {
+                preserveScroll: true, 
                 onSuccess: () => closeModal(),
             });
         } else {
-            // Jika mode tambah, gunakan fungsi POST ke rute menu.store
+            // SUNTIKKAN JUGA DI SINI (Opsional, agar saat tambah menu baru tidak lompat)
             post(route('menu.store'), {
+                preserveScroll: true, 
                 onSuccess: () => closeModal(),
             });
         }
     };
 
-    // Fungsi untuk menghapus data
     const deleteMenu = (id, name) => {
         if (confirm(`Apakah Anda yakin ingin menghapus menu "${name}"?`)) {
-            router.delete(route('menu.destroy', id));
+            // SUNTIKKAN JUGA PADA ROUTER DELETE AGAR AMAN
+            router.delete(route('menu.destroy', id), {
+                preserveScroll: true
+            });
         }
     };
 
