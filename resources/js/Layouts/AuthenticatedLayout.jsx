@@ -25,19 +25,22 @@ export default function AuthenticatedLayout({ header, children }) {
 
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 {/* Menu yang HANYA muncul untuk Admin */}
-                             {user.role === 'admin' && (
-                                 <>
-                                     <NavLink href={route('dashboard')} active={route().current('dashboard')}>
-                                         Dashboard Admin
-                                     </NavLink>
-                                     <NavLink href={route('menu.index')} active={route().current('menu.index')}>
-                                         Manajemen Menu
-                                     </NavLink>
-                                     <NavLink href={route('expense.index')} active={route().current('expense.index')}>
-                                         Pengeluaran
-                                     </NavLink>
-                                 </>
-                             )}
+                                {user.role === 'admin' && (
+                                    <>
+                                        <NavLink href={route('dashboard')} active={route().current('dashboard')}>
+                                            Dashboard Admin
+                                        </NavLink>
+                                        <NavLink href={route('menu.index')} active={route().current('menu.index')}>
+                                            Manajemen Menu
+                                        </NavLink>
+                                        <NavLink href={route('expense.index')} active={route().current('expense.index')}>
+                                            Pengeluaran
+                                        </NavLink>
+                                        <NavLink href={route('employee.index')} active={route().current('employee.index')}>
+                                            Karyawan
+                                        </NavLink>
+                                    </>
+                                )}
                                 
                                 {/* Menu yang muncul untuk Admin maupun Kasir */}
                                 <NavLink href={route('kasir.index')} active={route().current('kasir.index')}>
@@ -153,6 +156,9 @@ export default function AuthenticatedLayout({ header, children }) {
                              </ResponsiveNavLink>
                              <ResponsiveNavLink href={route('expense.index')} active={route().current('expense.index')}>
                                  Pengeluaran
+                             </ResponsiveNavLink>
+                             <ResponsiveNavLink href={route('employee.index')} active={route().current('employee.index')}>
+                                 Karyawan
                              </ResponsiveNavLink>
                          </>
                      )}
