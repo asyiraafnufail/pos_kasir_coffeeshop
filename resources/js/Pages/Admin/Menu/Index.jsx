@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, router } from '@inertiajs/react'; 
 import Modal from '@/Components/Modal';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
@@ -9,32 +9,65 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 
 export default function MenuIndex({ auth, menus, categories }) {
-    // State untuk mengontrol buka-tutup Modal
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-    // Form handler dari Inertia.js
-    const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
+    const [isEditMode, setIsEditMode] = useState(false); 
+    const [currentMenuId, setCurrentMenuId] = useState(null); 
+    const { data, setData, post, put, processing, errors, reset, clearErrors } = useForm({
         name: '',
         category_id: categories.length > 0 ? categories[0].id : '',
         price: '',
         is_available: true,
     });
 
-    const openModal = () => {
+    // Buka form untuk Tambah Data
+    const openAddModal = () => {
+        setIsEditMode(false);
+        reset();
+        clearErrors();
+        setIsModalOpen(true);
+    };
+
+    // Buka form untuk Edit Data
+    const openEditModal = (menu) => {
+        setIsEditMode(true);
+        setCurrentMenuId(menu.id);
+        setData({
+            name: menu.name,
+            category_id: menu.category_id,
+            price: menu.price,
+            is_available: menu.is_available === 1 || menu.is_available === true,
+        });
+        clearErrors();
         setIsModalOpen(true);
     };
 
     const closeModal = () => {
         setIsModalOpen(false);
-        reset(); // Kosongkan form saat ditutup
+        reset(); 
         clearErrors();
     };
 
     const submitForm = (e) => {
         e.preventDefault();
-        post(route('menu.store'), {
-            onSuccess: () => closeModal(),
-        });
+        
+        if (isEditMode) {
+            // Jika mode edit, gunakan fungsi PUT ke rute menu.update
+            put(route('menu.update', currentMenuId), {
+                onSuccess: () => closeModal(),
+            });
+        } else {
+            // Jika mode tambah, gunakan fungsi POST ke rute menu.store
+            post(route('menu.store'), {
+                onSuccess: () => closeModal(),
+            });
+        }
+    };
+
+    // Fungsi untuk menghapus data
+    const deleteMenu = (id, name) => {
+        if (confirm(`Apakah Anda yakin ingin menghapus menu "${name}"?`)) {
+            router.delete(route('menu.destroy', id));
+        }
     };
 
     return (
@@ -52,7 +85,7 @@ export default function MenuIndex({ auth, menus, categories }) {
                             Total Produk: <span className="font-bold text-indigo-600">{menus.length} Menu</span>
                         </p>
                         <button 
-                            onClick={openModal} // Trigger buka modal
+                            onClick={openAddModal}
                             className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-5 rounded-lg shadow-md transition-colors flex items-center gap-2 text-sm"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -99,10 +132,16 @@ export default function MenuIndex({ auth, menus, categories }) {
                                             </td>
                                             <td className="py-4 px-6 text-center">
                                                 <div className="flex justify-center items-center gap-3">
-                                                    <button className="text-amber-600 hover:text-amber-800 font-bold text-xs bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-md border border-amber-200 transition-colors">
+                                                    <button 
+                                                        onClick={() => openEditModal(menu)} // Trigger modal edit
+                                                        className="text-amber-600 hover:text-amber-800 font-bold text-xs bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-md border border-amber-200 transition-colors"
+                                                    >
                                                         EDIT
                                                     </button>
-                                                    <button className="text-red-600 hover:text-red-800 font-bold text-xs bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md border border-red-200 transition-colors">
+                                                    <button 
+                                                        onClick={() => deleteMenu(menu.id, menu.name)} // Trigger hapus
+                                                        className="text-red-600 hover:text-red-800 font-bold text-xs bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md border border-red-200 transition-colors"
+                                                    >
                                                         HAPUS
                                                     </button>
                                                 </div>
@@ -123,15 +162,14 @@ export default function MenuIndex({ auth, menus, categories }) {
                 </div>
             </div>
 
-            {/* ================= MODAL TAMBAH MENU ================= */}
+            {/* ================= MODAL TAMBAH/EDIT MENU ================= */}
             <Modal show={isModalOpen} onClose={closeModal} maxWidth="md">
                 <form onSubmit={submitForm} className="p-6">
                     <h2 className="text-lg font-bold text-gray-900 mb-6 border-b pb-2">
-                        Tambah Menu Baru
+                        {isEditMode ? 'Edit Menu' : 'Tambah Menu Baru'}
                     </h2>
 
                     <div className="space-y-4">
-                        {/* Input Nama Menu */}
                         <div>
                             <InputLabel htmlFor="name" value="Nama Menu" />
                             <TextInput
@@ -140,13 +178,11 @@ export default function MenuIndex({ auth, menus, categories }) {
                                 className="mt-1 block w-full"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
-                                placeholder="Contoh: Cappuccino"
                                 isFocused
                             />
                             <InputError message={errors.name} className="mt-2" />
                         </div>
 
-                        {/* Input Kategori */}
                         <div>
                             <InputLabel htmlFor="category_id" value="Kategori" />
                             <select
@@ -164,7 +200,6 @@ export default function MenuIndex({ auth, menus, categories }) {
                             <InputError message={errors.category_id} className="mt-2" />
                         </div>
 
-                        {/* Input Harga */}
                         <div>
                             <InputLabel htmlFor="price" value="Harga (Rp)" />
                             <TextInput
@@ -173,12 +208,10 @@ export default function MenuIndex({ auth, menus, categories }) {
                                 className="mt-1 block w-full"
                                 value={data.price}
                                 onChange={(e) => setData('price', e.target.value)}
-                                placeholder="Contoh: 25000"
                             />
                             <InputError message={errors.price} className="mt-2" />
                         </div>
 
-                        {/* Input Status */}
                         <div>
                             <InputLabel htmlFor="is_available" value="Status Stok" />
                             <select
@@ -198,7 +231,7 @@ export default function MenuIndex({ auth, menus, categories }) {
                             Batal
                         </SecondaryButton>
                         <PrimaryButton disabled={processing}>
-                            Simpan Menu
+                            {isEditMode ? 'Simpan Perubahan' : 'Simpan Menu'}
                         </PrimaryButton>
                     </div>
                 </form>
